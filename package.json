@@ -1,0 +1,12 @@
+{
+  "name": "picterest",
+  "version": "1.0.0",
+  "description": "Pinterest clone",
+  "keywords": [],
+  "workspaces" : [
+    "client",
+    "server"
+  ],
+  "author": "Adityesh Mishra",
+  "license": "MIT"
+}
