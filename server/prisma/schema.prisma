@@ -10,13 +10,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // User Model
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique @db.VarChar(255)
-  name String @unique @db.VarChar(255)
-  password String @db.VarBit(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int            @id @default(autoincrement())
+  email     String         @unique @db.VarChar(255)
+  name      String         @unique @db.VarChar(255)
+  password  String         @db.VarBit(255)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  pins      Pin[]
+  likedPins PinUserLikes[]
+}
+
+model Pin {
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(80)
+  image        String         @db.Text()
+  author       User           @relation(fields: [authorId], references: [id])
+  authorId     Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  likes PinUserLikes[]
+}
+
+model PinUserLikes {
+  id      Int  @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id]) 
+  pin     Pin  @relation(fields: [pinId], references: [id]) 
+  userId  Int @unique()
+  pinId   Int @unique()
+  liked  Boolean @default(false)
 }
