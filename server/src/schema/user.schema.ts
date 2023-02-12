@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from "zod";
+import { object, string, TypeOf, optional } from "zod";
 
 export const registerSchema = object({
     email: string().email(),
@@ -7,8 +7,8 @@ export const registerSchema = object({
 });
 
 export const loginSchema = object({
-    email: string().email().optional(),
-    name: string().optional(),
+    email: optional(string().email()),
+    name: optional(string()),
     password: string(),
 });
 

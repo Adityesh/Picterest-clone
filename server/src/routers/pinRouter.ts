@@ -1,11 +1,8 @@
-import { Pin } from "../prisma";
-import { procedure, router } from "../trpc";
+import { addPinSchema, getPinSchema } from "../schema/pin.schema";
+import { addPin, getPins } from "../services/pin";
+import { privateProcedure, procedure, router } from "../trpc";
 
 export const pinRouter = router({
-    getPinsPublic: procedure
-        // .input(null)
-        .query(async () => {
-            const result = await Pin.findMany();
-            return result;
-        }),
+    addPin : procedure.input(addPinSchema).mutation(addPin),
+    getPins : procedure.input(getPinSchema).mutation(getPins)
 });
