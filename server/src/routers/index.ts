@@ -1,6 +1,8 @@
-import { router } from "../trpc";
+import { router, t } from "../trpc";
+import { pinRouter } from "./pinRouter";
 import { userRouter } from "./userRouter";
 
 export const appRouter = router({
-    user : userRouter
-})
+    user: userRouter,
+    pin: pinRouter,
+});
