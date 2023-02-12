@@ -1,25 +1,33 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { httpBatchLink } from '@trpc/client'
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AppRouter } from '../../server/src/trpc'
 import App from './App'
-import './index.css'
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom"
+import { MantineProvider } from '@mantine/core';
 import { trpc } from './trpc'
+import './index.css'
+import Index from './routes'
+import Error from './routes/error'
+import Home from './routes/home'
+import { NotificationsProvider } from '@mantine/notifications'
 
-const client = createTRPCProxyClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: 'YOUR_SERVER_URL',
-      fetch(url, options) {
-        return fetch(url, {
-          ...options,
-          credentials: 'include',
-        } as RequestInit);
-      },
-    }),
-  ],
-});
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: "/home",
+        element: <Home />
+      }
+    ]
+  },
+]);
 
 const Root = () => {
   const [queryClient] = useState(() => new QueryClient());
@@ -40,11 +48,17 @@ const Root = () => {
   );
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </trpc.Provider>
+    <MantineProvider withGlobalStyles withNormalizeCSS>
+      <NotificationsProvider>
+        <trpc.Provider client={trpcClient} queryClient={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider {...{ router: router }}>
+              <App />
+            </RouterProvider>
+          </QueryClientProvider>
+        </trpc.Provider>
+      </NotificationsProvider>
+    </MantineProvider>
   )
 }
 

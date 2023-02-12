@@ -13,6 +13,26 @@ export const registerUser = async ({
     input: UserRegisterInput;
 }) => {
     const { email, name, password } = input;
+    const doesUserExist = await User.findFirst({
+        where: {
+            OR: [
+                {
+                    email,
+                },
+                {
+                    name,
+                },
+            ],
+        },
+    });
+
+    if(doesUserExist) {
+        throw new TRPCError({
+            code : "BAD_REQUEST",
+            message : "User already exists"
+        })
+    }
+
     const SALT_ROUNDS = 10;
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     return await User.create({
