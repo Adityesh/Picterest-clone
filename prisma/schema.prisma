@@ -29,6 +29,7 @@ model Account {
     providerAccountId String
     refresh_token     String?  @db.Text
     access_token      String?  @db.Text
+    refresh_token_expires_in Int?
     expires_at        Int?
     token_type        String?
     scope             String?
@@ -55,6 +56,8 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    pins      Pin[]
+    likedPins PinUserLikes[]
 }
 
 model VerificationToken {
@@ -63,4 +66,24 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Pin {
+  id           String    @id @default(cuid())
+  title        String         @db.VarChar(80)
+  image        String         @db.Text()
+  author       User           @relation(fields: [authorId], references: [id])
+  authorId     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  likes PinUserLikes[]
+}
+
+model PinUserLikes {
+  id      String    @id @default(cuid())
+  user User @relation(fields: [userId], references: [id]) 
+  pin     Pin  @relation(fields: [pinId], references: [id]) 
+  userId  String
+  pinId   String
+  liked  Boolean @default(false)
 }
