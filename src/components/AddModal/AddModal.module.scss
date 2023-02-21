@@ -1,0 +1,13 @@
+@import "../../styles/colors";
+
+.modalContainer {
+    background-color: $light_blue;
+    color: white;
+    font-family: 'Josefin Sans' !important;
+    & .mantine-Modal-body {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: column;
+    }
+}

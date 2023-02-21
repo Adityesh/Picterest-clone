@@ -58,6 +58,7 @@ model User {
     sessions      Session[]
     pins      Pin[]
     likedPins PinUserLikes[]
+    @@index([name, email])
 }
 
 model VerificationToken {
@@ -77,6 +78,7 @@ model Pin {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   likes PinUserLikes[]
+  @@index([title])
 }
 
 model PinUserLikes {
