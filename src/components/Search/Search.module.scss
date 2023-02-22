@@ -12,9 +12,15 @@
 
 .addBtn {
     margin-left: 0.5rem;
+    font-size: 1.1rem;
     font-family: 'Josefin Sans';
     color : white;
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.158);
-    }
+}
+
+.iconStyle {
+    height : 17px;
+    width : 17px;
+    align-self: center;
+    margin-left: 5px;
+    display: inline;
 }
