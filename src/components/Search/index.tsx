@@ -1,5 +1,4 @@
 import styles from "./Search.module.scss";
-import { Input, Kbd, ActionIcon, Button } from "@mantine/core";
 import { GrReturn } from "react-icons/gr";
 import { BiImageAdd } from "react-icons/bi";
 import { useModalStore } from "~/store/modal";
@@ -12,24 +11,18 @@ export default function Search() {
 
     return (
         <div className={styles.container}>
-            <Input
-                placeholder="Search for pins"
-                rightSection={
-                    <Kbd>
-                        <GrReturn />
-                    </Kbd>
-                }
-                className={styles.searchContainer}
+            <input
+                type="text"
+                placeholder="Search"
+                className={styles.searchInput}
             />
             {isLoggedIn && (
-                <Button
-                    color="green"
-                    onClick={() => handleModal(true)}
+                <button
                     className={styles.addBtn}
-                    leftIcon={<BiImageAdd className={styles.iconStyle} />}
+                    onClick={() => handleModal(true)}
                 >
                     Add
-                </Button>
+                </button>
             )}
         </div>
     );

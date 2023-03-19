@@ -16,12 +16,8 @@ export const pinRouter = createTRPCRouter({
                         ordering: z.enum(["asc", "desc"]),
                     })
                     .optional(),
-                cursor: z
-                    .object({
-                        id: z.string(),
-                    })
-                    .optional(),
-                count: z.number({ required_error: "Count is required" }),
+                cursor: z.string().nullish(),
+                count: z.number(),
                 titleFilter: z.string().optional(),
             })
         )
@@ -30,21 +26,30 @@ export const pinRouter = createTRPCRouter({
                 ctx: { prisma },
                 input: { orderBy, cursor, count, titleFilter },
             }) => {
-                return await prisma.pin.findMany({
-                    take: count || 5,
-                    cursor,
+                const items = await prisma.pin.findMany({
+                    take: (count ?? 5) + 1,
+                    cursor: cursor ? { id: cursor } : undefined,
                     where: {
                         title: {
                             contains: titleFilter,
                         },
-
                     },
-                    orderBy: orderBy ? {
-                        [orderBy.field]: orderBy.ordering,
-                    } : undefined,
+                    orderBy: orderBy
+                        ? {
+                              [orderBy.field]: orderBy.ordering,
+                          }
+                        : undefined,
                 });
 
-                
+                let nextCursor: typeof cursor | undefined = undefined;
+                if (items.length > count) {
+                    const nextItem = items.pop()
+                    nextCursor = nextItem?.id;
+                }
+                return {
+                    items,
+                    nextCursor,
+                };
             }
         ),
 
@@ -141,32 +146,22 @@ export const pinRouter = createTRPCRouter({
             });
         }),
 
-    getPinInDetail : protectedProcedure
-        .input(z.object({
-            pinId : z.string(),
-        }))
-        .mutation(async ({ ctx : { prisma, session }, input : { pinId } }) => {
-            const doesUserExist = await prisma.user.findUnique({
-                where: {
-                    id: session.user.id,
-                },
-            });
-
-            if (!doesUserExist) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "User not found",
-                });
-            }
+    getPinInDetail: publicProcedure
+        .input(
+            z.object({
+                pinId: z.string(),
+            })
+        )
+        .query(async ({ ctx: { prisma, session }, input: { pinId } }) => {
 
             return await prisma.pin.findUnique({
-                where : {
-                    id : pinId
+                where: {
+                    id: pinId,
                 },
-                include : {
-                    author : true,
-                    likes : true,
-                }
-            })
-        })
+                include: {
+                    author: true,
+                    likes: true,
+                },
+            });
+        }),
 });

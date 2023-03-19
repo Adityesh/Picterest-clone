@@ -1,18 +1,123 @@
-.gridContainer {
-    display: -webkit-box; /* Not needed if autoprefixing */
-    display: -ms-flexbox; /* Not needed if autoprefixing */
-    display: flex;
-    // margin-left: -30px; /* gutter size offset */
-    width: auto;
-}
-.gridColumn {
-    padding-left: 30px; /* gutter size */
-    background-clip: padding-box;
+.pinGrid {
+    width: 100%;
+    margin: 0 auto;
 }
 
-/* Style your items */
-.gridColumn > div {
-    /* change div to reference your elements you put in <Masonry> */
-    background: grey;
-    margin-bottom: 30px;
+.gridContainer {
+    display: grid;
+    place-items: center;
+    gap: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.imageContainer {
+    cursor: pointer;
+    position: relative;
+    &:hover .overlay {
+        height: 70%;
+    }
+    
+    &:hover .blur {
+        // background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    &:hover .overlayTitle {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.pinImage {
+    width: 360px;
+    height: 360px;
+    object-fit: cover;
+    cursor: pointer;
+    
+    overflow: hidden;
+}
+
+.blur {
+    content: "";
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    transition: 0.08s linear;
+}
+
+.overlay {
+    background-color: #3a3d3c;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    z-index: 10;
+    height: 0%;
+    transition: height 0.08s linear;
+    clip-path: polygon(0% 17%, 100% 35%, 100% 100%, 0% 100%);
+}
+
+.overlayContent {
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    & > div {
+        display: flex;
+        align-items: center;
+        height: fit-content;
+        & > p {
+            color: white;
+            padding-left: 0.5rem;
+            font-weight: 600;
+            font-family: 'Josefin Sans';
+            font-size: 1.25rem;
+        }
+    
+        & > img {
+            height: 35px;
+            width: 35px;
+            border-radius: 5px;
+        }
+    }
+}
+
+.overlayTitle {
+    font-size: 1.6rem;
+    color: white;
+    margin: 0;
+    font-weight: 700;
+    opacity: 0;
+    transition: all 0.1s linear;
+    transform: translateX(-200px);
+    transition-delay: 0.08s;
+}
+
+
+.overlayFooter {
+    display: flex;
+    align-items: center;
+    & > div {
+        display: flex;
+        margin-bottom: 0.5rem;
+        align-items: center;
+        justify-content: flex-start;
+        color: white;
+        margin-right: 1rem;
+        font-family: 'Josefin Sans';
+        font-size: 1.25rem;
+        font-weight: 600;
+        & > p {
+            margin: 0;
+            margin-left: 0.25rem;
+            margin-top: 0.25rem;
+            padding: 0;
+        }
+    }
 }

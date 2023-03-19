@@ -32,13 +32,15 @@ const initFormState: FormState = {
 };
 
 export default function AddModal() {
-    const { refetch : fetchPins } = api.pin.getPins.useQuery({ count: 5,
+    const { refetch: fetchPins } = api.pin.getPins.useQuery({
+        count: 5,
         orderBy: {
             field: "title",
             ordering: "asc",
-        },  })
+        },
+    });
     const { mutateAsync } = api.pin.addPin.useMutation({
-        onSuccess : () => fetchPins()
+        onSuccess: () => fetchPins(),
     });
     const { open, type, handleModal } = useModalStore((state) => state);
     const [formState, setFormState] = useState<FormState>(initFormState);
@@ -57,7 +59,10 @@ export default function AddModal() {
         formState.imageProps.loading,
     ]);
 
-    const isFormValid = isValidImage && formState.image.length > 0 && formState.title.length > 0
+    const isFormValid =
+        isValidImage &&
+        formState.image.length > 0 &&
+        formState.title.length > 0;
 
     const handleAddForm = (type: "close" | "open") => {
         setFormState(initFormState);
@@ -65,15 +70,15 @@ export default function AddModal() {
     };
 
     const handleFormChange = (type: "image" | "title", value: string) => {
-        if(type === "image" && value.length === 0) {
+        if (type === "image" && value.length === 0) {
             setFormState({
                 ...formState,
-                imageProps : {
-                    error : false,
-                    loading : false,
-                    valid : false
-                }
-            })
+                imageProps: {
+                    error: false,
+                    loading: false,
+                    valid: false,
+                },
+            });
         }
         setFormState({
             ...formState,
@@ -84,7 +89,7 @@ export default function AddModal() {
     const handleImageValidation = () => {
         const { image, imageProps, title } = formState;
 
-        if (image.length === 0) return
+        if (image.length === 0) return;
 
         // Start loading if image url is not empty
         setFormState({
@@ -128,20 +133,31 @@ export default function AddModal() {
     const handleAddPin = async () => {
         try {
             const result = await mutateAsync({
-                image : formState.image,
-                title : formState.title
-            })
-        } catch(error) {
-            console.log(error)
+                image: formState.image,
+                title: formState.title,
+            });
+        } catch (error) {
+            console.log(error);
         }
-    }
+    };
 
     return (
         <Modal
             opened={open}
             onClose={() => handleAddForm("close")}
-            title={type === "add" ? "Add Pin" : "Update Pin"}
+            title={
+                <span
+                    style={{
+                        fontFamily: "Josefin Sans",
+                        fontWeight: 600,
+                        fontSize: "1.5rem",
+                    }}
+                >
+                    {type === "add" ? "Add Pin" : "Update Pin"}
+                </span>
+            }
             classNames={{ modal: styles.modalContainer }}
+            overlayBlur={5}
         >
             <div className={styles.modalBody}>
                 <MantineImage
@@ -161,22 +177,31 @@ export default function AddModal() {
                     }}
                 />
                 {formState.imageProps.loading && "Loading"}
-                <Input
+                <input
                     className={styles.input}
                     placeholder="Enter image url"
                     onChange={(e) => handleFormChange("image", e.target.value)}
                     onBlur={handleImageValidation}
                 />
-                <Input
+                <input
                     className={styles.input}
                     placeholder="Enter title"
                     onChange={(e) => handleFormChange("title", e.target.value)}
                 />
                 <Group sx={{ marginTop: "1rem" }}>
-                    <Button color="green" disabled={!isFormValid} onClick={handleAddPin}>
+                    <Button
+                        color="green"
+                        disabled={!isFormValid}
+                        sx={{ fontFamily: "Josefin Sans", paddingTop : "0.25rem" }}
+                        onClick={handleAddPin}
+                    >
                         {type === "add" ? "Add Pin" : "Update Pin"}
                     </Button>
-                    <Button onClick={() => handleAddForm("close")} color={"red"}>
+                    <Button
+                        onClick={() => handleAddForm("close")}
+                        sx={{ fontFamily: "Josefin Sans", paddingTop : "0.25rem" }}
+                        color={"red"}
+                    >
                         Cancel
                     </Button>
                 </Group>

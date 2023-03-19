@@ -1,7 +1,7 @@
 @import "../../styles/colors";
 
 .modalContainer {
-    background-color: $light_blue;
+    background-color: #567189;
     color: white;
     font-family: 'Josefin Sans' !important;
     & .mantine-Modal-body {
@@ -14,4 +14,14 @@
 
 .input {
     margin: 0.75rem 0;
+    width: 100%;
+    font-family: 'Josefin Sans';
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: white;
+    background-color: #7B8FA1;
+    &:focus {
+        outline : none;
+    }
 }
