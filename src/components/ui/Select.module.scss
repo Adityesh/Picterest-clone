@@ -1,0 +1,19 @@
+.parentContainer {
+    & input {
+        background-color: #393c4f;
+        height: 2.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        padding-top: 0.25rem;
+        padding-left: 0.5rem;
+        color: white;
+        font-size: 1.25rem;
+        font-family: 'Josefin Sans';
+        background-color: #393c4f;
+    }
+    
+    & label {
+        color : white;
+        font-family: Josefin Sans;
+    }
+}

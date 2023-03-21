@@ -1,0 +1,37 @@
+@import "../../styles/colors";
+
+.left {
+    & > p {
+        font-family: 'Josefin Sans';
+        font-weight: bold;
+        color: white;
+        font-size: 2rem;
+    }
+}
+
+.nav {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 5rem;
+    padding: 0 1rem;
+    background-color: #191a24;
+}
+
+.iconStyle {
+    height : 17px;
+    width : 17px;
+    align-self: center;
+    margin-left: 5px;
+    display: inline;
+}
+
+.btn {
+    font-size: 1.1rem;
+}
+
+.right {
+    display: flex;
+    align-items: center;
+}
