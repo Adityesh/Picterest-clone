@@ -1,26 +1,18 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import {
-    createTRPCRouter,
-    publicProcedure,
-    protectedProcedure,
+    createTRPCRouter, protectedProcedure, publicProcedure
 } from "~/server/api/trpc";
+import {
+    AddPinSchema,
+    GetPinInDetailSchema,
+    GetPinSchema,
+    RemovePinSchema,
+    UpdatePinSchema
+} from "../../../schema/pin";
 
 export const pinRouter = createTRPCRouter({
     getPins: publicProcedure
-        .input(
-            z.object({
-                orderBy: z
-                    .object({
-                        field: z.enum(["title", "createdAt", "updatedAt"]),
-                        ordering: z.enum(["asc", "desc"]),
-                    })
-                    .optional(),
-                cursor: z.string().nullish(),
-                count: z.number(),
-                titleFilter: z.string().optional(),
-            })
-        )
+        .input(GetPinSchema)
         .query(
             async ({
                 ctx: { prisma },
@@ -43,7 +35,7 @@ export const pinRouter = createTRPCRouter({
 
                 let nextCursor: typeof cursor | undefined = undefined;
                 if (items.length > count) {
-                    const nextItem = items.pop()
+                    const nextItem = items.pop();
                     nextCursor = nextItem?.id;
                 }
                 return {
@@ -54,12 +46,7 @@ export const pinRouter = createTRPCRouter({
         ),
 
     addPin: protectedProcedure
-        .input(
-            z.object({
-                title: z.string(),
-                image: z.string().url({ message: "Image must be a url" }),
-            })
-        )
+        .input(AddPinSchema)
         .mutation(
             async ({ ctx: { prisma, session }, input: { image, title } }) => {
                 const doesUserExist = await prisma.user.findUnique({
@@ -86,11 +73,7 @@ export const pinRouter = createTRPCRouter({
         ),
 
     removePin: protectedProcedure
-        .input(
-            z.object({
-                pinId: z.string(),
-            })
-        )
+        .input(RemovePinSchema)
         .mutation(async ({ ctx: { prisma, session }, input: { pinId } }) => {
             const doesUserExist = await prisma.user.findUnique({
                 where: {
@@ -114,13 +97,7 @@ export const pinRouter = createTRPCRouter({
         }),
 
     updatePin: protectedProcedure
-        .input(
-            z.object({
-                pinId: z.string(),
-                title: z.string().optional(),
-                image: z.string().url({ message: "Invalid url" }).optional(),
-            })
-        )
+        .input(UpdatePinSchema)
         .mutation(async ({ input, ctx: { prisma, session } }) => {
             const doesUserExist = await prisma.user.findUnique({
                 where: {
@@ -147,13 +124,8 @@ export const pinRouter = createTRPCRouter({
         }),
 
     getPinInDetail: publicProcedure
-        .input(
-            z.object({
-                pinId: z.string(),
-            })
-        )
+        .input(GetPinInDetailSchema)
         .query(async ({ ctx: { prisma, session }, input: { pinId } }) => {
-
             return await prisma.pin.findUnique({
                 where: {
                     id: pinId,

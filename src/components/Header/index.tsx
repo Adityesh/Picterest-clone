@@ -1,11 +1,11 @@
 import styles from "./Header.module.scss";
-import { Button } from "@mantine/core";
 import { useSession, signIn, signOut } from "next-auth/react";
 import {
     RiLoginCircleLine,
     RiLogoutCircleLine,
     RiGithubLine,
 } from "react-icons/ri";
+import Button from "../ui/Button";
 export default function Header() {
     const { data: sessionData } = useSession();
     const isLoggedIn = sessionData?.user;
@@ -17,19 +17,25 @@ export default function Header() {
             </div>
             <div className={styles.right}>
                 {isLoggedIn ? (
-                    <Button className={styles.btn} onClick={() => void signOut()} color="red">
-                        Log out{" "}
-                        <RiLogoutCircleLine className={styles.iconStyle} />
-                    </Button>
+                    <Button
+                        variant="secondary"
+                        onClick={() => void signOut()}
+                        value="Log out"
+                    />
                 ) : (
                     <>
-                        <Button className={styles.btn} onClick={() => void signIn("github")} color="green">
-                            Login{" "}
-                            <RiLoginCircleLine className={styles.iconStyle} />
-                        </Button>
-                        <Button className={styles.btn} onClick={() => void signIn("github")} sx={{marginLeft : "5px"}}>
-                            Register <RiGithubLine className={styles.iconStyle} />
-                        </Button>
+                        <Button
+                            value="Log in"
+                            variant="primary"
+                            onClick={() => void signIn("github")}
+                        />
+
+                        <Button
+                            variant="default"
+                            value="Register"
+                            onClick={() => void signIn("github")}
+                            style={{ marginLeft: "5px", display : "inline-block" }}
+                        />
                     </>
                 )}
             </div>

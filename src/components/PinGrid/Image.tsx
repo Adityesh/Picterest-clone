@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { type Pin } from "@prisma/client";
 import { api } from "~/utils/api";
 import {
@@ -11,8 +11,6 @@ import styles from "./PinGrid.module.scss";
 export function Image(props: Pin) {
     const overlayRef = useRef<HTMLDivElement>(null);
 
-
-
     const {
         refetch: fetchPin,
         isLoading,
@@ -21,7 +19,7 @@ export function Image(props: Pin) {
         {
             pinId: props.id,
         },
-        { enabled: false, staleTime: 1000 * 60 * 10 }
+        { enabled: false, staleTime: 1000 * 60 * 10, cacheTime: 5 * 60 * 1000 }
     );
 
     const handleFetchData = () => {

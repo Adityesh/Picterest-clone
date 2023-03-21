@@ -1,15 +1,9 @@
 import { useModalStore } from "~/store/modal";
-import {
-    Modal,
-    Image as MantineImage,
-    Input,
-    Group,
-    Button,
-    Text,
-} from "@mantine/core";
+import { Modal, Image as MantineImage, Group, Text } from "@mantine/core";
 import styles from "./AddModal.module.scss";
 import { useMemo, useState } from "react";
 import { api } from "~/utils/api";
+import Button from "../ui/Button";
 
 type FormState = {
     image: string;
@@ -190,20 +184,20 @@ export default function AddModal() {
                 />
                 <Group sx={{ marginTop: "1rem" }}>
                     <Button
-                        color="green"
+                        variant="default"
+                        value="Add"
                         disabled={!isFormValid}
-                        sx={{ fontFamily: "Josefin Sans", paddingTop : "0.25rem" }}
+                        style={{ paddingTop: "0.25rem" }}
                         onClick={handleAddPin}
-                    >
-                        {type === "add" ? "Add Pin" : "Update Pin"}
-                    </Button>
+                    />
                     <Button
+                        value="Cancel"
+                        variant="secondary"
                         onClick={() => handleAddForm("close")}
-                        sx={{ fontFamily: "Josefin Sans", paddingTop : "0.25rem" }}
-                        color={"red"}
-                    >
-                        Cancel
-                    </Button>
+                        style={{
+                            paddingTop: "0.25rem",
+                        }}
+                    />
                 </Group>
             </div>
         </Modal>

@@ -1,0 +1,18 @@
+.filterContainer {
+    color : white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Josefin Sans;
+    width : 50rem;
+    margin: 0.5rem auto;
+    margin-bottom: 2rem;
+    & > * {
+        margin-right: 2rem;
+        flex: 1;
+        margin-left: 0;
+        max-width: 8rem;
+    }
+
+    
+}

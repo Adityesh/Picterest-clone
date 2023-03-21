@@ -1,25 +1,27 @@
+import { Divider, Progress } from "@mantine/core";
+import { Pin } from "@prisma/client";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useFilterStore } from "~/store/filter";
 import { api } from "~/utils/api";
 import styles from "./PinGrid.module.scss";
-import { useMemo, useEffect, useCallback, useRef } from "react";
-import { Pin } from "@prisma/client";
-import { Image } from "./Image";
-import { Divider, Loader, Progress } from "@mantine/core";
+const Image = dynamic(() => import("./Image").then((mod) => mod.Image));
 
 export default function PinGrid() {
+    const { count, orderBy, titleFilter } = useFilterStore();
     const observerElem = useRef<HTMLDivElement>(null);
     const { data, hasNextPage, fetchNextPage, isFetchingNextPage } =
         api.pin.getPins.useInfiniteQuery(
             {
-                count: 5,
-                orderBy: {
-                    field: "createdAt",
-                    ordering: "asc",
-                },
+                titleFilter,
+                count,
+                orderBy,
             },
             {
                 getNextPageParam: (lastPage) => {
                     return lastPage.nextCursor;
                 },
+                staleTime: 5 * 60 * 1000,
             }
         );
 
@@ -32,6 +34,8 @@ export default function PinGrid() {
         },
         [fetchNextPage, hasNextPage]
     );
+
+    console.log(titleFilter, "titleFilter")
 
     const paginatedData = useMemo(() => {
         let result: Pin[] = [];
@@ -64,7 +68,7 @@ export default function PinGrid() {
                     paginatedData.length > 0 && (
                         <Progress value={100} animate />
                     )}
-                <Divider sx={{ margin: "1rem auto", width : "95%" }} />
+                <Divider sx={{ margin: "1rem auto", width: "95%" }} />
             </div>
         </div>
     );

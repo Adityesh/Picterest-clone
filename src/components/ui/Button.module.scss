@@ -1,0 +1,22 @@
+.buttonContainer {
+
+}
+
+.button {
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    position: relative;
+    padding: 0.25rem 0.75rem;
+    font-family: Josefin Sans;
+    padding-top: 0.5rem;
+    min-width: 6rem;
+    min-height: 3rem;
+    margin: 0 5px;
+    color: white;
+    overflow: hidden;
+
+    &:active {
+        transform: translateY(2px);
+    }
+}
