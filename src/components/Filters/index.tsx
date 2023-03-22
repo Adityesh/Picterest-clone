@@ -15,7 +15,7 @@ export default function Filters() {
             <SelectInput
                 label="Count"
                 placeholder="Count"
-                data={["5", "10", "20"]}
+                data={["10", "20", "100"]}
                 value={count.toString()}
                 onChange={(value) => updateCount(Number(value))}
             />

@@ -1,4 +1,4 @@
-import { Divider, Progress } from "@mantine/core";
+import { Progress } from "@mantine/core";
 import { Pin } from "@prisma/client";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -35,7 +35,6 @@ export default function PinGrid() {
         [fetchNextPage, hasNextPage]
     );
 
-    console.log(titleFilter, "titleFilter")
 
     const paginatedData = useMemo(() => {
         let result: Pin[] = [];
@@ -68,7 +67,6 @@ export default function PinGrid() {
                     paginatedData.length > 0 && (
                         <Progress value={100} animate />
                     )}
-                <Divider sx={{ margin: "1rem auto", width: "95%" }} />
             </div>
         </div>
     );

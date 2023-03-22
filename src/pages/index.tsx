@@ -2,8 +2,6 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import Filters from "~/components/Filters";
-import { Divider } from "@mantine/core";
-import Button from "~/components/ui/Button";
 const Header = dynamic(() => import("~/components/Header"));
 const Search = dynamic(() => import("~/components/Search"));
 const AddModal = dynamic(() => import("~/components/AddModal"));

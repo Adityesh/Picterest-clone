@@ -3,7 +3,7 @@ import { z } from "zod";
 export const GetPinSchema = z.object({
     orderBy: z
         .object({
-            field: z.enum(["title", "createdAt", "updatedAt"]),
+            field: z.enum(["title", "createdAt", "updatedAt", "id"]),
             ordering: z.enum(["asc", "desc"]),
         })
         .optional(),

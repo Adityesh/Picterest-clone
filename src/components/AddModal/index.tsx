@@ -1,9 +1,18 @@
 import { useModalStore } from "~/store/modal";
-import { Modal, Image as MantineImage, Group, Text } from "@mantine/core";
+import {
+    Modal,
+    Image as MantineImage,
+    Group,
+    Text,
+    Skeleton,
+} from "@mantine/core";
 import styles from "./AddModal.module.scss";
 import { useMemo, useState } from "react";
 import { api } from "~/utils/api";
 import Button from "../ui/Button";
+import { showToast } from "~/utils/functions";
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "~/utils/message";
+import { useFilterStore } from "~/store/filter";
 
 type FormState = {
     image: string;
@@ -26,15 +35,11 @@ const initFormState: FormState = {
 };
 
 export default function AddModal() {
-    const { refetch: fetchPins } = api.pin.getPins.useQuery({
-        count: 5,
-        orderBy: {
-            field: "title",
-            ordering: "asc",
-        },
-    });
+    const utils = api.useContext();
     const { mutateAsync } = api.pin.addPin.useMutation({
-        onSuccess: () => fetchPins(),
+        onSuccess: () => {
+            utils.pin.getPins.invalidate();
+        },
     });
     const { open, type, handleModal } = useModalStore((state) => state);
     const [formState, setFormState] = useState<FormState>(initFormState);
@@ -126,12 +131,15 @@ export default function AddModal() {
 
     const handleAddPin = async () => {
         try {
-            const result = await mutateAsync({
+            await mutateAsync({
                 image: formState.image,
                 title: formState.title,
             });
+            handleModal(false);
+            setFormState(initFormState);
+            showToast(SUCCESS_MESSAGES.ADD_PIN, "default");
         } catch (error) {
-            console.log(error);
+            showToast(ERROR_MESSAGES.ACTION, "error");
         }
     };
 
@@ -154,23 +162,36 @@ export default function AddModal() {
             overlayBlur={5}
         >
             <div className={styles.modalBody}>
-                <MantineImage
-                    src={formState.image || ""}
+                <Skeleton
+                    visible={formState.imageProps.loading}
+                    height={120}
                     width={200}
-                    placeholder={
-                        <Text align="center">
-                            This image contained the meaning of life
-                        </Text>
-                    }
                     sx={{
-                        margin: "1rem auto",
-                        objectFit: "cover",
-                        // background: "grey",
-                        height:
-                            formState?.image.length === 0 ? "120px" : undefined,
+                        margin: "0 auto",
+                        "&::before": {
+                            backgroundColor: "#8BC6EC",
+                            backgroundImage: `linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%)`,
+                        },
                     }}
-                />
-                {formState.imageProps.loading && "Loading"}
+                >
+                    <MantineImage
+                        src={formState.image || ""}
+                        width={200}
+                        placeholder={
+                            <Text align="center">
+                                This image contained the meaning of life
+                            </Text>
+                        }
+                        sx={{
+                            margin: "1rem auto",
+                            objectFit: "cover",
+                            height:
+                                formState?.image.length === 0
+                                    ? "120px !important"
+                                    : undefined,
+                        }}
+                    />
+                </Skeleton>
                 <input
                     className={styles.input}
                     placeholder="Enter image url"

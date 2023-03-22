@@ -4,7 +4,7 @@ import type { GetPinType as BaseType } from "../schema/pin";
 type GetPinType = Omit<BaseType, "cursor"> & {
     updateCount: (value: number) => void;
     updateOrder: (
-        field: "title" | "createdAt" | "updatedAt",
+        field: "title" | "createdAt" | "updatedAt" | "id",
         ordering: "asc" | "desc"
     ) => void;
     updateFilterTitle: (title: string) => void;
@@ -13,14 +13,14 @@ type GetPinType = Omit<BaseType, "cursor"> & {
 export const useFilterStore = create<GetPinType>((set) => ({
     titleFilter: "",
     orderBy: {
-        field: "title",
-        ordering: "asc",
+        field: "createdAt",
+        ordering: "desc",
     },
-    count: 5,
+    count: 10,
     updateCount: (value: number) => set(() => ({ count: value })),
     updateOrder: (
-        field: "title" | "createdAt" | "updatedAt" = "title",
-        ordering: "asc" | "desc" = "asc"
+        field: "title" | "createdAt" | "updatedAt" | "id" = "createdAt",
+        ordering: "asc" | "desc" = "desc"
     ) =>
         set(() => ({
             orderBy: {
