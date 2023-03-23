@@ -22,6 +22,7 @@ export function showToast(
                 break;
             case "info":
                 borderColor = "#136F63";
+                break;
             default:
                 borderColor = "#3F88C5";
         }

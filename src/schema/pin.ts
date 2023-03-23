@@ -40,3 +40,10 @@ export const GetPinInDetailSchema = z.object({
 })
 
 export type GetPinInDetailType = z.TypeOf<typeof GetPinInDetailSchema>;
+
+export const PinLikeSchema = z.object({
+    pinId : z.string(),
+    userId : z.string(),
+})
+
+export type PinLikeType = z.TypeOf<typeof PinLikeSchema>;

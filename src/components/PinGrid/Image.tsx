@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, memo, useMemo } from "react";
 import { type Pin } from "@prisma/client";
 import { api } from "~/utils/api";
 import {
@@ -8,21 +8,59 @@ import {
 } from "react-icons/ai";
 import styles from "./PinGrid.module.scss";
 import { Skeleton } from "@mantine/core";
+import { showToast } from "~/utils/functions";
+import { ERROR_MESSAGES } from "~/utils/message";
+import { Loader } from "@mantine/core";
+import { useSession } from "next-auth/react";
 
-export function Image(props: Pin) {
+function Image(props: Pin) {
     const [imgLoading, setImgLoading] = useState(true);
     const overlayRef = useRef<HTMLDivElement>(null);
-    const imgRef = useRef<HTMLImageElement>(null);
+    const { data: sessionData } = useSession();
 
     const { refetch: fetchPin, data } = api.pin.getPinInDetail.useQuery(
         {
             pinId: props.id,
         },
-        { enabled: false, staleTime: 1000 * 60 * 10, cacheTime: 5 * 60 * 1000 }
+        {
+            enabled: false,
+            staleTime: 1000 * 60 * 10,
+            cacheTime: 5 * 60 * 1000,
+            onError: (err) => {
+                showToast(ERROR_MESSAGES.SINGLE_PIN_FETCH, "error");
+            },
+        }
     );
+
+    const hasUserLikedPin = useMemo(() => {
+        const likes = data?.likes;
+        if (!likes) return false;
+        return likes.some((like) => like.userId === sessionData?.user.id);
+    }, [data?.likes, sessionData?.user.id]);
+
+    const { isLoading: isLikeLoading, mutateAsync: togglePinLikeAsync } =
+        api.pin.likePin.useMutation({
+            onSuccess: () => {
+                fetchPin();
+            },
+            onError: () => {
+                showToast(ERROR_MESSAGES.LIKE_PIN, "error");
+            },
+        });
 
     const handleFetchData = () => {
         fetchPin();
+    };
+
+    const handlePinLike = () => {
+        try {
+            togglePinLikeAsync({
+                pinId: props.id,
+                userId: sessionData?.user.id!,
+            });
+        } catch (error) {
+            showToast(ERROR_MESSAGES.LIKE_PIN, "error");
+        }
     };
 
     return (
@@ -37,7 +75,6 @@ export function Image(props: Pin) {
                 }}
             >
                 <img
-                    ref={imgRef}
                     src={props.image}
                     className={styles.pinImage}
                     loading="lazy"
@@ -63,10 +100,28 @@ export function Image(props: Pin) {
                                     <AiOutlineFieldTime fontSize={"1.5rem"} />
                                     <p>{data?.createdAt.toDateString()}</p>
                                 </div>
-                                <div>
-                                    <AiOutlineHeart fontSize={"1.5rem"} />
-                                    <p>{data?.likes.length || 0}</p>
-                                </div>
+                                {sessionData?.user && (
+                                    <div>
+                                        {isLikeLoading ? (
+                                            <Loader size="sm" />
+                                        ) : (
+                                            <>
+                                                {hasUserLikedPin ? (
+                                                    <AiFillHeart
+                                                        fontSize={"1.5rem"}
+                                                        onClick={handlePinLike}
+                                                    />
+                                                ) : (
+                                                    <AiOutlineHeart
+                                                        fontSize={"1.5rem"}
+                                                        onClick={handlePinLike}
+                                                    />
+                                                )}
+                                                <p>{data?.likes.length || 0}</p>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -76,3 +131,5 @@ export function Image(props: Pin) {
         </div>
     );
 }
+
+export default memo(Image);

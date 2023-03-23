@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFilterStore } from "~/store/filter";
 import { api } from "~/utils/api";
 import styles from "./PinGrid.module.scss";
-const Image = dynamic(() => import("./Image").then((mod) => mod.Image));
+const Image = dynamic(() => import("./Image").then((mod) => mod.default));
 
 export default function PinGrid() {
     const { count, orderBy, titleFilter } = useFilterStore();

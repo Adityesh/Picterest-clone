@@ -1,4 +1,4 @@
-import { CSSProperties, MouseEventHandler } from "react";
+import { CSSProperties, MouseEventHandler, memo } from "react";
 import styles from "./Button.module.scss";
 
 type ButtonProps = {
@@ -16,7 +16,7 @@ const colors = {
     primary: "#136F63",
 };
 
-export default function Button({
+function Button({
     value,
     onClick,
     style,
@@ -40,3 +40,5 @@ export default function Button({
         </div>
     );
 }
+
+export default memo(Button)

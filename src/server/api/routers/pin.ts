@@ -1,13 +1,16 @@
 import { TRPCError } from "@trpc/server";
 import {
-    createTRPCRouter, protectedProcedure, publicProcedure
+    createTRPCRouter,
+    protectedProcedure,
+    publicProcedure,
 } from "~/server/api/trpc";
 import {
     AddPinSchema,
     GetPinInDetailSchema,
     GetPinSchema,
+    PinLikeSchema,
     RemovePinSchema,
-    UpdatePinSchema
+    UpdatePinSchema,
 } from "../../../schema/pin";
 
 export const pinRouter = createTRPCRouter({
@@ -19,11 +22,12 @@ export const pinRouter = createTRPCRouter({
                 input: { orderBy, cursor, count, titleFilter },
             }) => {
                 const items = await prisma.pin.findMany({
-                    take: (count ?? 5) + 1,
+                    take: (count ?? 10) + 1,
                     cursor: cursor ? { id: cursor } : undefined,
                     where: {
                         title: {
                             contains: titleFilter,
+                            mode: "insensitive",
                         },
                     },
                     orderBy: orderBy
@@ -130,10 +134,72 @@ export const pinRouter = createTRPCRouter({
                 where: {
                     id: pinId,
                 },
-                include: {
-                    author: true,
-                    likes: true,
+                select: {
+                    createdAt : true,
+                    title : true,
+                    likes: {
+                        where: {
+                            liked: true,
+                        },
+                    },
+                    author: {
+                        select: {
+                            image: true,
+                            name: true,
+                        },
+                    },
                 },
             });
+        }),
+
+    likePin: protectedProcedure
+        .input(PinLikeSchema)
+        .mutation(async ({ input, ctx: { prisma, session } }) => {
+            const { pinId, userId } = input;
+
+            const [pin, user, pinUserLike] = await Promise.all([
+                prisma.pin.findUniqueOrThrow({
+                    where: {
+                        id: pinId,
+                    },
+                }),
+                prisma.user.findUniqueOrThrow({
+                    where: {
+                        id: userId,
+                    },
+                }),
+                prisma.pinUserLikes.findFirst({
+                    where: {
+                        userId,
+                        pinId,
+                    },
+                }),
+            ]);
+
+            if (!pinUserLike) {
+                // Pin is getting liked by the user for the first time.
+                // Create a new PinUserLike record
+                await prisma.pinUserLikes.create({
+                    data: {
+                        liked: true,
+                        pinId,
+                        userId,
+                    },
+                });
+                return true;
+            }
+
+            // PinUserLike object already exists
+            // toggle the value from that in the db
+            await prisma.pinUserLikes.update({
+                where: {
+                    id: pinUserLike.id,
+                },
+                data: {
+                    liked: !pinUserLike.liked,
+                },
+            });
+
+            return false;
         }),
 });

@@ -1,11 +1,8 @@
 import styles from "./Header.module.scss";
 import { useSession, signIn, signOut } from "next-auth/react";
-import {
-    RiLoginCircleLine,
-    RiLogoutCircleLine,
-    RiGithubLine,
-} from "react-icons/ri";
 import Button from "../ui/Button";
+
+
 export default function Header() {
     const { data: sessionData } = useSession();
     const isLoggedIn = sessionData?.user;

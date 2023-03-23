@@ -13,10 +13,10 @@
 }
 
 .imageContainer {
-    cursor: pointer;
     position: relative;
     &:hover .overlay {
         height: 70%;
+        cursor: pointer;
     }
     
     &:hover .blur {
