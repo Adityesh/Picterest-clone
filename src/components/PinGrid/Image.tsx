@@ -6,6 +6,8 @@ import {
     AiOutlineHeart,
     AiOutlineFieldTime,
 } from "react-icons/ai";
+import { TbError404 } from "react-icons/tb";
+import { AiOutlineReload } from "react-icons/ai";
 import styles from "./PinGrid.module.scss";
 import { Skeleton } from "@mantine/core";
 import { showToast } from "~/utils/functions";
@@ -15,6 +17,7 @@ import { useSession } from "next-auth/react";
 
 function Image(props: Pin) {
     const [imgLoading, setImgLoading] = useState(true);
+    const [imgError, setImgError] = useState(false);
     const overlayRef = useRef<HTMLDivElement>(null);
     const { data: sessionData } = useSession();
 
@@ -58,6 +61,10 @@ function Image(props: Pin) {
                 pinId: props.id,
                 userId: sessionData?.user.id!,
             });
+            showToast(
+                `Pin ${hasUserLikedPin ? "unliked" : "liked"} successfully`,
+                "default"
+            );
         } catch (error) {
             showToast(ERROR_MESSAGES.LIKE_PIN, "error");
         }
@@ -79,7 +86,9 @@ function Image(props: Pin) {
                     className={styles.pinImage}
                     loading="lazy"
                     decoding="async"
+                    key={props.id}
                     onLoad={() => setImgLoading(false)}
+                    onError={() => setImgError(true)}
                 />
             </Skeleton>
 
@@ -127,6 +136,12 @@ function Image(props: Pin) {
                     </div>
                     <div className={styles.blur}></div>
                 </>
+            )}
+
+            {imgError && (
+                <div className={styles.overlayError}>
+                    <TbError404 />
+                </div>
             )}
         </div>
     );

@@ -35,3 +35,24 @@
     display: flex;
     align-items: center;
 }
+
+.dropDown {
+    background-color: #919299;
+    font-family: Josefin Sans;
+}
+
+.menuLabel {
+    color: white;
+    font-family: Josefin Sans;
+    font-weight: bold;
+}
+
+.menuItem {
+    color : white;
+    font-size: 1rem;
+
+    font-family: Josefin Sans;
+    &[data-hovered=true] {
+        background-color: #3F88C5;
+    }
+}

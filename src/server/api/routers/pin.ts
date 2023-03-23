@@ -137,6 +137,7 @@ export const pinRouter = createTRPCRouter({
                 select: {
                     createdAt : true,
                     title : true,
+                    image : true,
                     likes: {
                         where: {
                             liked: true,

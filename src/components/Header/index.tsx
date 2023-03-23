@@ -1,11 +1,12 @@
 import styles from "./Header.module.scss";
 import { useSession, signIn, signOut } from "next-auth/react";
+import dynamic from "next/dynamic";
+import MenuNav from "./MenuNav";
 import Button from "../ui/Button";
 
-
 export default function Header() {
-    const { data: sessionData } = useSession();
-    const isLoggedIn = sessionData?.user;
+    const { data } = useSession();
+    const isLoggedIn = data != null;
 
     return (
         <div className={styles.nav}>
@@ -14,26 +15,17 @@ export default function Header() {
             </div>
             <div className={styles.right}>
                 {isLoggedIn ? (
-                    <Button
-                        variant="secondary"
-                        onClick={() => void signOut()}
-                        value="Log out"
-                    />
+                    <MenuNav />
                 ) : (
-                    <>
-                        <Button
-                            value="Log in"
-                            variant="primary"
-                            onClick={() => void signIn("github")}
-                        />
-
-                        <Button
-                            variant="default"
-                            value="Register"
-                            onClick={() => void signIn("github")}
-                            style={{ marginLeft: "5px", display : "inline-block" }}
-                        />
-                    </>
+                    <Button
+                        variant="default"
+                        value="Sign in"
+                        onClick={() => void signIn("github")}
+                        style={{
+                            marginLeft: "5px",
+                            display: "inline-block",
+                        }}
+                    />
                 )}
             </div>
         </div>
