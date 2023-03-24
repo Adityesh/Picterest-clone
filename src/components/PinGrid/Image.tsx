@@ -7,15 +7,16 @@ import {
     AiOutlineFieldTime,
 } from "react-icons/ai";
 import { TbError404 } from "react-icons/tb";
-import { AiOutlineReload } from "react-icons/ai";
 import styles from "./PinGrid.module.scss";
 import { Skeleton } from "@mantine/core";
 import { showToast } from "~/utils/functions";
 import { ERROR_MESSAGES } from "~/utils/message";
 import { Loader } from "@mantine/core";
 import { useSession } from "next-auth/react";
+import { useRouter } from 'next/router';
 
 function Image(props: Pin) {
+    const router = useRouter();
     const [imgLoading, setImgLoading] = useState(true);
     const [imgError, setImgError] = useState(false);
     const overlayRef = useRef<HTMLDivElement>(null);
@@ -94,7 +95,7 @@ function Image(props: Pin) {
 
             {!imgLoading && (
                 <>
-                    <div className={styles.overlay} ref={overlayRef}>
+                    <div className={styles.overlay} ref={overlayRef} onClick={() => router.push('/pin/' + props.id)}>
                         <div className={styles.overlayContent}>
                             <p className={styles.overlayTitle}>{data?.title}</p>
                             <div>

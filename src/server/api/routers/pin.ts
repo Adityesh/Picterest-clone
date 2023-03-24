@@ -203,4 +203,41 @@ export const pinRouter = createTRPCRouter({
 
             return false;
         }),
+    
+    fetchPinDetail : publicProcedure
+        .input(GetPinInDetailSchema)
+        .query(async ({ input, ctx: { prisma, session }}) => {
+            const { pinId } = input;
+            const pinDetails = await prisma.pin.findUnique({
+                where : {
+                    id : pinId,
+                },
+                select : {
+                    createdAt : true,
+                    image : true,
+                    title : true,
+                    author : {
+                        select : {
+                            email : true,
+                            image : true,
+                            name : true
+                        }
+                    },
+                    likes : {
+                        where : {
+                            liked : true
+                        },
+                        select : {
+                            id : true,
+                            pinId : true,
+                            userId : true,
+                            user : true
+                        }
+                    }
+
+                }
+            })
+
+            return pinDetails
+        })    
 });

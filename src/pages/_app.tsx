@@ -7,6 +7,7 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import "~/styles/globals.css";
+import Layout from "./_layout";
 
 const MyApp: AppType<{ session: Session | null }> = ({
     Component,
@@ -17,7 +18,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
             <ReactQueryDevtools initialIsOpen />
             <MantineProvider withGlobalStyles withNormalizeCSS>
                 <NotificationsProvider position="top-right">
-                    <Component {...pageProps} />
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
                 </NotificationsProvider>
             </MantineProvider>
         </SessionProvider>
