@@ -29,6 +29,7 @@
         margin-left : 0.75rem;
         color: white;
         font-weight: 600;
+        padding-top: 0.35rem;
         font-size: 1.25rem;
     }
 }
@@ -38,4 +39,38 @@
     font-size: 1.25rem;
     color: white;
     text-align: center;
+}
+
+.commentOptions {
+    display: flex;
+    align-items: center;
+    color : white;
+    justify-content: space-between;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+
+    & > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & > span {
+            padding-top: 0.35rem;
+            margin-left : 0.75rem;
+        }
+    }
+}
+
+.left {
+    & > svg {
+        color : red;
+        cursor: pointer;
+    }
+}
+
+.right {
+    & > svg {
+        color : #3F88C5;
+        cursor: pointer;
+    }
 }

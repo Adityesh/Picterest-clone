@@ -1,4 +1,8 @@
 import { showNotification } from "@mantine/notifications";
+import { GetCommentsQueryType } from "~/schema/comment";
+import  dayjs from "dayjs";
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
 
 export function debounce(cb: (...args: any) => void, delay: number = 250) {
     let timeout: NodeJS.Timeout;
@@ -49,3 +53,11 @@ export function showToast(
         message,
     });
 }
+
+export function dateFormatter(date : Date) {
+    if(!date) return ""
+
+    return dayjs(date).fromNow()
+}
+
+

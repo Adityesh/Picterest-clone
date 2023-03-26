@@ -1,4 +1,4 @@
-import { useRef, useState, memo, useMemo } from "react";
+import { useRef, useState, memo, useMemo, MouseEventHandler, BaseSyntheticEvent } from "react";
 import { type Pin } from "@prisma/client";
 import { api } from "~/utils/api";
 import {
@@ -56,7 +56,8 @@ function Image(props: Pin) {
         fetchPin();
     };
 
-    const handlePinLike = () => {
+    const handlePinLike = (e : any) => {
+        e.stopPropagation();
         try {
             togglePinLikeAsync({
                 pinId: props.id,

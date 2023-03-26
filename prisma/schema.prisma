@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["fullTextSearch"]
 }
 
@@ -23,20 +23,20 @@ model Example {
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String?  @db.Text
-    access_token      String?  @db.Text
+    id                       String  @id @default(cuid())
+    userId                   String
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String? @db.Text
+    access_token             String? @db.Text
     refresh_token_expires_in Int?
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String?  @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String? @db.Text
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -50,15 +50,18 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String         @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?        @unique
     emailVerified DateTime?
     image         String?
     accounts      Account[]
     sessions      Session[]
-    pins      Pin[]
-    likedPins PinUserLikes[]
+    pins          Pin[]
+    likedPins     PinUserLikes[]
+    comments      Comment[]
+    CommentLike   CommentLike[]
+
     @@index([name, email])
 }
 
@@ -71,22 +74,48 @@ model VerificationToken {
 }
 
 model Pin {
-  id           String    @id @default(cuid())
-  title        String         @db.VarChar(80)
-  image        String         @db.Text()
-  author       User           @relation(fields: [authorId], references: [id])
-  authorId     String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  likes PinUserLikes[]
-  @@index([title])
+    id        String         @id @default(cuid())
+    title     String         @db.VarChar(80)
+    image     String         @db.Text()
+    author    User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    authorId  String
+    createdAt DateTime       @default(now())
+    updatedAt DateTime       @updatedAt
+    likes     PinUserLikes[]
+    comments  Comment[]
+
+    @@index([title])
 }
 
 model PinUserLikes {
-  id      String    @id @default(cuid())
-  user User @relation(fields: [userId], references: [id]) 
-  pin     Pin  @relation(fields: [pinId], references: [id]) 
-  userId  String
-  pinId   String
-  liked  Boolean @default(false)
+    id     String  @id @default(cuid())
+    user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    pin    Pin     @relation(fields: [pinId], references: [id], onDelete: Cascade)
+    userId String
+    pinId  String
+    liked  Boolean @default(false)
+}
+
+model Comment {
+    id          String        @id @default(cuid())
+    text        String
+    pinId       String
+    pin         Pin           @relation(fields: [pinId], references: [id], onDelete: Cascade)
+    user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId      String
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    parent      Comment?      @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+    children    Comment[]     @relation("ParentChild")
+    parentId    String?
+    CommentLike CommentLike[]
+}
+
+model CommentLike {
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+    commentId String
+
+    @@id([userId, commentId])
 }

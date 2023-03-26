@@ -1,9 +1,20 @@
 import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import styles from "./PinDetail.module.scss";
-import { Avatar, LoadingOverlay, Progress, Skeleton } from "@mantine/core";
-import { useState } from "react";
+import { AiOutlineHeart, AiFillHeart, AiOutlineComment } from "react-icons/ai";
+import {
+    Avatar,
+    Divider,
+    LoadingOverlay,
+    Progress,
+    Skeleton,
+} from "@mantine/core";
+import { useState, useMemo, useCallback } from "react";
 import Head from "next/head";
+import { dateFormatter } from "~/utils/functions";
+import CommentInput from "~/components/Comment/CommentInput";
+import { GetCommentsQueryType } from "~/schema/comment";
+import CommentList from "~/components/Comment/CommentList";
 
 export default function PinDetail() {
     const {
@@ -20,6 +31,20 @@ export default function PinDetail() {
             staleTime: 30 * 60 * 1000,
         }
     );
+    const { isLoading: isCommentsLoading, data: result } =
+        api.comment.getComments.useQuery({
+            pinId: id as string,
+        });
+    const { count, comments } = result || { count : 0, comments : {}};
+
+    const getCommentsByParentId = useCallback(
+        (parentId: string) => {
+            if (!comments) return [];
+            return comments[parentId];
+        },
+        [comments, id]
+    );
+
     return (
         <>
             <Head>
@@ -61,12 +86,26 @@ export default function PinDetail() {
                         <span>{data?.author.name || ""}</span>
                     </div>
                     <p className={styles.pinDate}>
-                        {data?.createdAt.toDateString()}
+                        {dateFormatter(data?.createdAt!)}
                     </p>
 
-                    <div>
-                        likes : {data?.likes.length}
+                    <div className={styles.commentOptions}>
+                        <div className={styles.left}>
+                            <AiOutlineHeart size="1.75rem" />
+                            <span>{0}</span>
+                        </div>
+                        <div className={styles.right}>
+                            <AiOutlineComment size="1.75rem" />
+                            <span>{count}</span>
+                        </div>
                     </div>
+                    <Divider />
+
+                    <CommentInput pinId={data?.id!} />
+                    <CommentList
+                        isNested={false}
+                        comments={!comments ? [] : comments["null"]! || []}
+                    />
                 </div>
             </div>
         </>

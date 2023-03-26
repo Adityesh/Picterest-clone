@@ -213,9 +213,11 @@ export const pinRouter = createTRPCRouter({
                     id : pinId,
                 },
                 select : {
+                    id : true,
                     createdAt : true,
                     image : true,
                     title : true,
+                    authorId : true,
                     author : {
                         select : {
                             email : true,
