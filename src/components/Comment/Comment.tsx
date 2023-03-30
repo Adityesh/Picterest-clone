@@ -1,7 +1,7 @@
-import { Avatar } from "@mantine/core";
+import { Avatar, Loader } from "@mantine/core";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, memo } from "react";
 import { GoPrimitiveDot } from "react-icons/go";
 import { CommentType } from "~/schema/comment";
 import { api } from "~/utils/api";
@@ -10,17 +10,19 @@ import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "~/utils/message";
 import styles from "./Comment.module.scss";
 import CommentInput from "./CommentInput";
 import CommentList from "./CommentList";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 
 type CommentProps = {
     comment: CommentType;
 };
 
-export default function Comment({
+function Comment({
     comment: {
         text,
         user: { name, image, id: userId },
         createdAt,
         id: commentId,
+        commentLikes,
     },
 }: CommentProps) {
     const { id } = useRouter().query;
@@ -43,10 +45,22 @@ export default function Comment({
             onSuccess: () => utils.comment.getComments.invalidate(),
         });
 
+    const { isLoading: isLikeLoading, mutateAsync: toggleCommentLike } =
+        api.comment.likeComment.useMutation({
+            onSuccess: () => utils.comment.getComments.invalidate(),
+        });
+
     const childComments = useMemo(() => {
         const { comments } = data || { count: 0, comments: {} };
         return comments[commentId];
     }, [commentId, data]);
+
+    const hasUserLikedComment = useMemo(() => {
+        if(commentLikes.length === 0) return false
+        return commentLikes.some(
+            (comment) => comment.userId === session?.user.id
+        );
+    }, [commentLikes]);
 
     const handleDeleteComment = async () => {
         try {
@@ -62,6 +76,18 @@ export default function Comment({
         }
     };
 
+    const handleLikeComment = async () => {
+        try {
+            const result = await toggleCommentLike({
+                commentId,
+                userId: session?.user.id as string,
+            });
+            showToast(result, "default");
+        } catch (error) {
+            showToast(ERROR_MESSAGES.ACTION, "error");
+        }
+    };
+
     return (
         <>
             <div className={styles.commentContainer}>
@@ -72,7 +98,7 @@ export default function Comment({
                             <span className={styles.commentAuthor}>{name}</span>
                             <div>
                                 <span className={styles.commentLikes}>
-                                    0 likes
+                                    {commentLikes.length} likes
                                 </span>
                                 <GoPrimitiveDot
                                     className={styles.commentHeaderDot}
@@ -119,6 +145,26 @@ export default function Comment({
                             >
                                 {edit ? "Cancel" : "Edit"}
                             </a>
+                            {isLikeLoading ? (
+                                <Loader size={"sm"} />
+                            ) : (
+                                <>
+                                    {hasUserLikedComment ? (
+                                        <AiFillHeart
+                                            onClick={handleLikeComment}
+                                            color="red"
+                                            size={"1.15rem"}
+                                            className={styles.commentLikeBtn}
+                                        />
+                                    ) : (
+                                        <AiOutlineHeart
+                                            onClick={handleLikeComment}
+                                            className={styles.commentLikeBtn}
+                                            size={"1.15rem"}
+                                        />
+                                    )}
+                                </>
+                            )}
                         </>
                     )}
                 </div>
@@ -137,3 +183,5 @@ export default function Comment({
         </>
     );
 }
+
+export default memo(Comment);

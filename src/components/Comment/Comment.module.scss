@@ -31,6 +31,27 @@
 
 .nestedCommentsList {
     padding-left: 2rem;
+    position: relative;
+    transition: opacity 0.15s ease-in-out, transform 0.15s  ease-in-out;
+    & > .commentsToggle {
+        position: absolute;
+        left: -0.025rem;
+        background-color: red;
+        height: 100%;
+        width: 3px !important;
+        cursor: pointer;
+    }
+}
+
+.listHidden {
+    opacity: 0;
+    transform: translateX(-100px);
+    z-index: -100;
+}
+
+.listVisible {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .commentContainer {
@@ -110,4 +131,9 @@
         margin-right: 1rem;
         cursor: pointer;
     }
+}
+
+.commentLikeBtn { 
+    padding-bottom: 0.25rem;
+    cursor: pointer;
 }

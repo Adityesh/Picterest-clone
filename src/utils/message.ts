@@ -11,7 +11,8 @@ export enum ERROR_MESSAGES {
     ADD_COMMENT = "Failed to add a comment",
     DELETE_COMMENT = "Failed to delete comment",
     UPDATE_COMMENT = "Failed to update comment",
-    REQUIRED_COMMENT_INPUT = "Comment cannot be empty"
+    REQUIRED_COMMENT_INPUT = "Comment cannot be empty",
+    LIKE_COMMENT = "Failed to like comment"
 }
 
 export enum SUCCESS_MESSAGES {
@@ -20,5 +21,6 @@ export enum SUCCESS_MESSAGES {
     UNLIKE_PIN = "Pin unliked successfully",
     ADD_COMMENT = "Comment added successfully",
     DELETE_COMMENT = "Comment deleted successfully",
-    UPDATE_COMMENT = "Comment updated successfully"
+    UPDATE_COMMENT = "Comment updated successfully",
+    LIKE_COMMENT = "Comment liked successfully"
 }

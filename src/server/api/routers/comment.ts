@@ -5,6 +5,7 @@ import {
     LikeCommentSchema,
     UpdateCommentSchema,
 } from "~/schema/comment";
+import { SUCCESS_MESSAGES } from "~/server/utils/error";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const commentRouter = createTRPCRouter({
@@ -61,6 +62,12 @@ export const commentRouter = createTRPCRouter({
                             name: true,
                         },
                     },
+                    commentLikes: {
+                        select: {
+                            commentId: true,
+                            userId: true,
+                        },
+                    },
                 },
             });
 
@@ -77,6 +84,7 @@ export const commentRouter = createTRPCRouter({
                     updatedAt: Date;
                     pinId: string;
                     parentId: string | null;
+                    commentLikes: { commentId: string; userId: string }[];
                 }[];
             } = {};
             result.forEach((comment) => {
@@ -115,11 +123,35 @@ export const commentRouter = createTRPCRouter({
 
             return true;
         }),
-    
-    
-    likeComment : protectedProcedure
-    .input(LikeCommentSchema)
-    .mutation(async ({ ctx: { prisma, session }, input }) => {
-        
-    })
+
+    likeComment: protectedProcedure
+        .input(LikeCommentSchema)
+        .mutation(async ({ ctx: { prisma, session }, input }) => {
+            const { commentId, userId } = input;
+
+            const [user, comment, commentLike] = await Promise.all([
+                prisma.user.findUniqueOrThrow({ where: { id: userId } }),
+                prisma.comment.findUniqueOrThrow({ where: { id: commentId } }),
+                prisma.commentLike.findFirst({ where : { commentId, userId }})
+            ]);
+
+
+            if(commentLike === null) {
+                // new like from the user
+                await prisma.commentLike.create({
+                    data: {
+                        commentId,
+                        userId,
+                    },
+                });
+                return SUCCESS_MESSAGES.LIKE_COMMENT
+            }
+            
+            await prisma.commentLike.delete({
+                where : {
+                    userId_commentId : input
+                }
+            })
+            return SUCCESS_MESSAGES.UNLIKE_COMMENT;
+        }),
 });

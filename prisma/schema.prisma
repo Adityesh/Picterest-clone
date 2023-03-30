@@ -108,7 +108,7 @@ model Comment {
     parent      Comment?      @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
     children    Comment[]     @relation("ParentChild")
     parentId    String?
-    CommentLike CommentLike[]
+    commentLikes CommentLike[]
 }
 
 model CommentLike {

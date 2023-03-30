@@ -8,21 +8,28 @@ import {
     LoadingOverlay,
     Progress,
     Skeleton,
+    Loader,
 } from "@mantine/core";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import Head from "next/head";
-import { dateFormatter } from "~/utils/functions";
+import { dateFormatter, showToast } from "~/utils/functions";
 import CommentInput from "~/components/Comment/CommentInput";
-import { GetCommentsQueryType } from "~/schema/comment";
 import CommentList from "~/components/Comment/CommentList";
+import { useSession } from "next-auth/react";
+import { ERROR_MESSAGES } from "~/utils/message";
 
 export default function PinDetail() {
+    const { data: sessionData } = useSession();
     const {
         query: { id },
     } = useRouter();
     const [imgLoading, setImgLoading] = useState(true);
     const [imgError, setImgError] = useState(false);
-    const { isLoading, data } = api.pin.fetchPinDetail.useQuery(
+    const {
+        isLoading,
+        data,
+        refetch: fetchPin,
+    } = api.pin.fetchPinDetail.useQuery(
         {
             pinId: id as string,
         },
@@ -32,18 +39,47 @@ export default function PinDetail() {
         }
     );
     const { isLoading: isCommentsLoading, data: result } =
-        api.comment.getComments.useQuery({
-            pinId: id as string,
-        });
-    const { count, comments } = result || { count : 0, comments : {}};
+        api.comment.getComments.useQuery(
+            {
+                pinId: id as string,
+            },
+            {
+                staleTime: 5 * 60 * 1000,
+            }
+        );
 
-    const getCommentsByParentId = useCallback(
-        (parentId: string) => {
-            if (!comments) return [];
-            return comments[parentId];
-        },
-        [comments, id]
-    );
+    const { isLoading: isLikeLoading, mutateAsync: togglePinLikeAsync } =
+        api.pin.likePin.useMutation({
+            onSuccess: () => {
+                fetchPin();
+            },
+            onError: () => {
+                showToast(ERROR_MESSAGES.LIKE_PIN, "error");
+            },
+        });
+
+    const { count, comments } = result || { count: 0, comments: {} };
+
+    const hasUserLikedPin = useMemo(() => {
+        const likes = data?.likes;
+        if (!likes) return false;
+        return likes.some((like) => like.userId === sessionData?.user.id);
+    }, [data?.likes, sessionData?.user.id]);
+
+    const handleLikePin = () => {
+        try {
+            togglePinLikeAsync({
+                pinId: id as string,
+                userId: sessionData?.user.id!,
+            });
+            showToast(
+                `Pin ${hasUserLikedPin ? "unliked" : "liked"} successfully`,
+                "default"
+            );
+        } catch (error) {
+            showToast(ERROR_MESSAGES.LIKE_PIN, "error");
+        }
+    };
 
     return (
         <>
@@ -91,8 +127,24 @@ export default function PinDetail() {
 
                     <div className={styles.commentOptions}>
                         <div className={styles.left}>
-                            <AiOutlineHeart size="1.75rem" />
-                            <span>{0}</span>
+                            {isLikeLoading ? (
+                                <Loader size="md" />
+                            ) : (
+                                <>
+                                    {hasUserLikedPin ? (
+                                        <AiFillHeart
+                                            size="1.75rem"
+                                            onClick={handleLikePin}
+                                        />
+                                    ) : (
+                                        <AiOutlineHeart
+                                            size="1.75rem"
+                                            onClick={handleLikePin}
+                                        />
+                                    )}
+                                </>
+                            )}
+                            <span>{data?.likes.length}</span>
                         </div>
                         <div className={styles.right}>
                             <AiOutlineComment size="1.75rem" />
