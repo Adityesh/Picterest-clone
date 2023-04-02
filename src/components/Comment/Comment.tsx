@@ -27,7 +27,7 @@ function Comment({
 }: CommentProps) {
     const { id } = useRouter().query;
     const { data: session } = useSession();
-    const canCommentActions = userId === session?.user.id;
+    const canCommentActions = session != null && userId === session?.user.id;
 
     const [reply, setReply] = useState(false);
 
@@ -56,7 +56,7 @@ function Comment({
     }, [commentId, data]);
 
     const hasUserLikedComment = useMemo(() => {
-        if(commentLikes.length === 0) return false
+        if (commentLikes.length === 0) return false;
         return commentLikes.some(
             (comment) => comment.userId === session?.user.id
         );
@@ -123,7 +123,7 @@ function Comment({
                     />
                 )}
                 <div className={styles.commentFooter}>
-                    {!reply && (
+                    {session !== null && !reply && (
                         <a
                             onClick={() => setReply((reply) => !reply)}
                             style={{ color: "#3F88C5" }}

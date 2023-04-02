@@ -20,6 +20,7 @@ import { ERROR_MESSAGES } from "~/utils/message";
 
 export default function PinDetail() {
     const { data: sessionData } = useSession();
+    const canPerformActions = sessionData !== null;
     const {
         query: { id },
     } = useRouter();
@@ -131,15 +132,33 @@ export default function PinDetail() {
                                 <Loader size="md" />
                             ) : (
                                 <>
-                                    {hasUserLikedPin ? (
+                                    {hasUserLikedPin && !canPerformActions ? (
                                         <AiFillHeart
                                             size="1.75rem"
-                                            onClick={handleLikePin}
+                                            style={{
+                                                cursor: !canPerformActions
+                                                    ? "not-allowed"
+                                                    : "initial",
+                                            }}
+                                            onClick={
+                                                !canPerformActions
+                                                    ? () => null
+                                                    : handleLikePin
+                                            }
                                         />
                                     ) : (
                                         <AiOutlineHeart
                                             size="1.75rem"
-                                            onClick={handleLikePin}
+                                            style={{
+                                                cursor: !canPerformActions
+                                                    ? "not-allowed"
+                                                    : "initial",
+                                            }}
+                                            onClick={
+                                                !canPerformActions
+                                                    ? () => null
+                                                    : handleLikePin
+                                            }
                                         />
                                     )}
                                 </>

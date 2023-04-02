@@ -17,6 +17,7 @@ type CommentInputProps = {
 
 export default function CommentInput(props: CommentInputProps) {
     const { data: sessionData } = useSession();
+    const canPerformActions = sessionData !== null;
     const utils = api.useContext();
     const { pinId, parentId } = props;
     const { mutateAsync: addComment } = api.comment.addComment.useMutation();
@@ -69,10 +70,22 @@ export default function CommentInput(props: CommentInputProps) {
             <form>
                 <textarea
                     value={text}
-                    onKeyDown={handleAddComment}
-                    onChange={(e) => setText(e.target.value)}
+                    disabled={!canPerformActions}
+                    placeholder={
+                        canPerformActions ? "" : "Please login to comment"
+                    }
+                    onKeyDown={
+                        canPerformActions ? handleAddComment : () => null
+                    }
+                    onChange={
+                        canPerformActions
+                            ? (e) => setText(e.target.value)
+                            : () => null
+                    }
                     className={styles.commentInput}
-                    onBlur={props.handleInputBlur}
+                    onBlur={
+                        canPerformActions ? props.handleInputBlur : () => null
+                    }
                 />
             </form>
         </div>
